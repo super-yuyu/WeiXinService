@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans          
+    http://www.springframework.org/schema/beans/spring-beans.xsd          
+    http://code.alibabatech.com/schema/dubbo          
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="dubbo-service" />
+
+	<!-- 使用multicast广播注册中心暴露服务地址 -->
+	<!-- <dubbo:registry address="multicast://localhost:1234" /> -->
+
+	<!-- 使用zookeeper注册中心暴露服务地址 -->
+	<dubbo:registry address="zookeeper://119.29.76.96:5919" />
+
+	<!-- 用dubbo协议在20880端口暴露服 务 -->
+	<dubbo:protocol name="dubbo" port="20880" />
+
+	<!-- 声明需要暴露的服务接口 -->
+	<dubbo:service interface="com.weixin.dubbo.service.IWeiXinService" ref="weixinService" version="1.0" />
+
+<!-- 服务注入 -->
+	<bean id="accessTokenDao" class="com.weixin.dubbo.sqldao.AccessTokenDao"></bean>
+
+	<!-- 服务注入 -->
+	<bean id="weiXinWriteServiceDao" class="com.weixin.dubbo.dao.impl.WeiXinWriteServiceDao">
+		<property name="redisTemplate" ref="redisTemplateWriter"></property>
+		<property name="sqldao" ref="accessTokenDao"></property>
+	</bean>
+
+	<!-- 服务注入 -->
+	<bean id="weiXinReaderServiceDao" class="com.weixin.dubbo.dao.impl.WeiXinReaderServiceDao">
+		<property name="redisTemplate" ref="redisTemplateReader"></property>
+		<property name="sqldao" ref="accessTokenDao"></property>
+		<property name="writeDao" ref="weiXinWriteServiceDao"></property>
+	</bean>
+	
+	<bean id="connetUtil" class="com.weixin.dubbo.util.ConnetUtil"></bean>
+	
+	<bean id="getAccessToken" class="com.weixin.dubbo.wx.GetAccessToken">
+		<property name="util" ref="connetUtil"></property>
+	</bean>
+	
+	<bean id="weixinService" class="com.weixin.dubbo.service.impl.WeiXinServiceImpl">
+		<property name="writeDao" ref="weiXinWriteServiceDao"></property>
+		<property name="readerDao" ref="weiXinReaderServiceDao"></property>
+		<property name="getAccessToken" ref="getAccessToken"></property>
+	</bean>
+</beans> 

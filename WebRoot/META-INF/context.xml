@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/WeiXinService">
+  <Resource auth="Container" 
+	  type="javax.sql.DataSource" 
+	  name="jdbc/mysql" 
+	  driverClassName="com.mysql.jdbc.Driver" 
+	  factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+	  url="jdbc:mysql://localhost:4408/weixin?rewriteBatchedStatements=true"
+	  username="root" 
+	  password="wangyang" 
+	  initialSize="10"  
+	  maxActive="50"  
+	  maxIdle="20"  
+	  minIdle="10"  
+	  fairQueue="true"
+      timeBetweenEvictionRunsMillis="30000"  
+      minEvictableIdleTimeMillis="60000"   
+      testWhileIdle="true"  
+      validationQuery="SELECT 1"  
+      validationInterval="30000"  
+      jdbcInterceptors="ConnectionState;StatementFinalizer;" 
+      defaultAutoCommit="false"
+  />
+</Context>
